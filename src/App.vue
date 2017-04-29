@@ -8,13 +8,16 @@
         <h3>{{ m.title | cap }}</h3>
         <div class="day" v-for="d in m.days">
           <h4>{{ d.date }} </h4>
-          <div v-for="e in m.events" class="event">
+          <div v-for="e in m.events" class="event" :style="{background: e.color}">
             <ul>
               <li v-for="(v, k) in e">
                 <b>{{ k | cap }}</b>: {{ v }}
               </li>
             </ul>
           </div>
+        </div>
+        <div class="clear">
+
         </div>
       </div>
     </div>
@@ -82,36 +85,32 @@
 
 <style lang="scss">
 .day {
-  flex-grow: 1;
-  flex-shrink: 1;
-  flex-basis: 0;
+  h4 {
+    color: #3d3d3d;
+  }
+
+  margin-bottom: 10px;
+
+  float: left;
+  border: 1px tomato solid;
+  color: #fff;
+  padding: 5px;
 }
 
-.week:first-of-type .day:first-of-type {
-  margin-left: 42.85714%;
-}
-
-.week:last-of-type .day:last-of-type {
-  margin-right: 14.285%;
+.clear {
+  clear: left
 }
 
 /* OTHER STYLES */
 .month {
-  display: flex;
-  max-width: 560px;
-  margin: 20px auto;
+  max-width: 100%;
+  margin: 40px;
+
+  display: block;
+
+  h3 {
+    display: block;
+  }
 }
 
-.week {
-  height: 80px;
-}
-
-.day {
-  color: #F98909;
-  padding: 5px;
-  background-color: transparentize(white, 0.30);
-  box-shadow:
-    -1px -1px #F9A440,
-    inset -1px -1px 0 0 #F9A440;
-}
 </style>
