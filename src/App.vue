@@ -1,60 +1,117 @@
 <template>
-  <div id="app">
-    <img src="./assets/logo.png">
-    <h1></h1>
-    <h2>Essential Links</h2>
-    <ul>
-      <li><a href="https://vuejs.org" target="_blank">Core Docs</a></li>
-      <li><a href="https://forum.vuejs.org" target="_blank">Forum</a></li>
-      <li><a href="https://gitter.im/vuejs/vue" target="_blank">Gitter Chat</a></li>
-      <li><a href="https://twitter.com/vuejs" target="_blank">Twitter</a></li>
-    </ul>
-    <h2>Ecosystem</h2>
-    <ul>
-      <li><a href="http://router.vuejs.org/" target="_blank">vue-router</a></li>
-      <li><a href="http://vuex.vuejs.org/" target="_blank">vuex</a></li>
-      <li><a href="http://vue-loader.vuejs.org/" target="_blank">vue-loader</a></li>
-      <li><a href="https://github.com/vuejs/awesome-vue" target="_blank">awesome-vue</a></li>
-    </ul>
+  <div>
+    <p v-if="isLoading">
+      Buscando eventos...
+    </p>
+    <div v-else>
+      <div v-for="m in months" class="month">
+        <h3>{{ m.title | cap }}</h3>
+        <div class="day" v-for="d in m.days">
+          <h4>{{ d.date }} </h4>
+          <div v-for="e in m.events" class="event">
+            <ul>
+              <li v-for="(v, k) in e">
+                <b>{{ k | cap }}</b>: {{ v }}
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
-export default {
-  name: 'app',
-  data () {
-    return {
-      msg: 'Welcome to Your Vue.js App'
+  /* globals fetch */
+
+  import moment from 'moment'
+
+  export default {
+    name: 'app',
+
+    data () {
+      return {
+        months: [],
+        isLoading: true
+      }
+    },
+
+    created () {
+      fetch('http://calendar-api.now.sh/')
+        .then(response => response.json())
+        .then(calendars => {
+          this.isLoading = false
+
+          this.formatCalendars(calendars)
+        })
+    },
+
+    methods: {
+      formatCalendars (calendars) {
+        calendars.forEach(c => {
+          const monthNumber = parseInt(moment().utc().month(c.when.month).format('MM')) - 1
+
+          const month = {
+            title: `${c.when.month} - ${c.when.year}`,
+            first: moment({ day: 1, month: monthNumber, year: c.year }).utc(),
+            events: c.events,
+            days: []
+          }
+
+          for (let i = 1; i <= month.first.daysInMonth(); i++) {
+            const day = {
+              date: moment({ day: i, month: monthNumber, year: c.year }).utc(),
+              events: []
+            }
+
+            month.events.forEach(e => {
+              if (e.date === day.date) {
+                day.events.push(e)
+              }
+            })
+
+            month.days.push(day)
+          }
+
+          this.months.push(month)
+        })
+      }
     }
   }
-}
 </script>
 
 <style lang="scss">
-#app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
+.day {
+  flex-grow: 1;
+  flex-shrink: 1;
+  flex-basis: 0;
 }
 
-h1, h2 {
-  font-weight: normal;
+.week:first-of-type .day:first-of-type {
+  margin-left: 42.85714%;
 }
 
-ul {
-  list-style-type: none;
-  padding: 0;
+.week:last-of-type .day:last-of-type {
+  margin-right: 14.285%;
 }
 
-li {
-  display: inline-block;
-  margin: 0 10px;
+/* OTHER STYLES */
+.month {
+  display: flex;
+  max-width: 560px;
+  margin: 20px auto;
 }
 
-a {
-  color: #42b983;
+.week {
+  height: 80px;
+}
+
+.day {
+  color: #F98909;
+  padding: 5px;
+  background-color: transparentize(white, 0.30);
+  box-shadow:
+    -1px -1px #F9A440,
+    inset -1px -1px 0 0 #F9A440;
 }
 </style>
