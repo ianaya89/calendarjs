@@ -40,7 +40,7 @@
     },
 
     created () {
-      fetch('http://calendar-api.now.sh/')
+      fetch('https://calendar-api.now.sh/')
         .then(response => response.json())
         .then(calendars => {
           this.isLoading = false
