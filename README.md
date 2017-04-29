@@ -1,6 +1,6 @@
-# calendarjs
+# Calendar.js
 
-> Calendar.js clone built with Vue.js
+> 📅 Calendar.js clone built with Vue.js
 
 ## Build Setup
 
